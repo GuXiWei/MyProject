@@ -5,6 +5,7 @@
 #include <QLineEdit>
 #include "mygauge1.h"
 #include "mygauge2.h"
+#include "mygauge3.h"
 
 namespace Ui {
 class Widget;
@@ -26,6 +27,10 @@ private slots:
     void onMyGauge1LineEditValueChange(QString);
     // ! 2
     void onMyGauge2LineEditValueChange(QString);
+    // ! 3
+    void onMyGauge3LineEditMinValueChange(QString);
+    void onMyGauge3LineEditMaxValueChange(QString);
+    void onMyGauge3Value(qreal);
 private:
     Ui::Widget *ui;
     // ! 1
@@ -34,6 +39,11 @@ private:
     // ! 2
     myGauge2*        m_pMyGauge2;
     QLineEdit*          m_pMyGauge2LineEdit;
+    // ! 3
+    myGauge3*        m_pMyGauge3;
+    QLineEdit*          m_pMyGauge3LineEditMax;
+    QLineEdit*          m_pMyGauge3LineEditMin;
+    QLineEdit*          m_pMyGauge3LineEditCurVal;
 };
 
 #endif // MAINWIDGET_H

@@ -15,10 +15,12 @@ TEMPLATE = app
 SOURCES += main.cpp\
         MainWidget.cpp \
     mygauge1.cpp \
-    mygauge2.cpp
+    mygauge2.cpp \
+    mygauge3.cpp
 
 HEADERS  += MainWidget.h \
     mygauge1.h \
-    mygauge2.h
+    mygauge2.h \
+    mygauge3.h
 
 FORMS    += MainWidget.ui
