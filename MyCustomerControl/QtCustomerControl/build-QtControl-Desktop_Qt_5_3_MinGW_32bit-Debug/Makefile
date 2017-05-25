@@ -174,6 +174,7 @@ Makefile: ../QtControl/QtControl.pro D:/Qt5.3.1/5.3/mingw482_32/mkspecs/win32-g+
 		../QtControl/QtControl.pro \
 		D:/Qt5.3.1/5.3/mingw482_32/lib/qtmaind.prl \
 		D:/Qt5.3.1/5.3/mingw482_32/lib/Qt5Cored.prl \
+		D:/Qt5.3.1/5.3/mingw482_32/lib/Qt5PrintSupport.prl \
 		D:/Qt5.3.1/5.3/mingw482_32/lib/Qt5Widgets.prl \
 		D:/Qt5.3.1/5.3/mingw482_32/lib/Qt5Gui.prl \
 		D:/Qt5.3.1/5.3/mingw482_32/lib/Qt5Core.prl
@@ -293,6 +294,7 @@ D:\Qt5.3.1\5.3\mingw482_32\mkspecs\features\lex.prf:
 ..\QtControl\QtControl.pro:
 D:/Qt5.3.1/5.3/mingw482_32/lib/qtmaind.prl:
 D:/Qt5.3.1/5.3/mingw482_32/lib/Qt5Cored.prl:
+D:/Qt5.3.1/5.3/mingw482_32/lib/Qt5PrintSupport.prl:
 D:/Qt5.3.1/5.3/mingw482_32/lib/Qt5Widgets.prl:
 D:/Qt5.3.1/5.3/mingw482_32/lib/Qt5Gui.prl:
 D:/Qt5.3.1/5.3/mingw482_32/lib/Qt5Core.prl:

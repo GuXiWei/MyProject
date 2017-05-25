@@ -1,0 +1,15 @@
+INPUT(
+./release\main.o
+./release\MainWidget.o
+./release\mygauge1.o
+./release\mygauge2.o
+./release\mygauge3.o
+./release\mycoolbar.o
+./release\qcustomplot.o
+./release\moc_MainWidget.o
+./release\moc_mygauge1.o
+./release\moc_mygauge2.o
+./release\moc_mygauge3.o
+./release\moc_mycoolbar.o
+./release\moc_qcustomplot.o
+);

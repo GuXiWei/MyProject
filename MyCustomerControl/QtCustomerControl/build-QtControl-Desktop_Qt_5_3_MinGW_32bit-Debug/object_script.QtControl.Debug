@@ -1,0 +1,15 @@
+INPUT(
+./debug\main.o
+./debug\MainWidget.o
+./debug\mygauge1.o
+./debug\mygauge2.o
+./debug\mygauge3.o
+./debug\mycoolbar.o
+./debug\qcustomplot.o
+./debug\moc_MainWidget.o
+./debug\moc_mygauge1.o
+./debug\moc_mygauge2.o
+./debug\moc_mygauge3.o
+./debug\moc_mycoolbar.o
+./debug\moc_qcustomplot.o
+);

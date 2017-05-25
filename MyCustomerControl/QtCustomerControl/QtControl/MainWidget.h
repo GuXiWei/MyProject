@@ -6,6 +6,8 @@
 #include "mygauge1.h"
 #include "mygauge2.h"
 #include "mygauge3.h"
+#include "mycoolbar.h"
+#include "qcustomplot.h"
 
 namespace Ui {
 class Widget;
@@ -21,6 +23,8 @@ public:
 
 private:
     void init();
+    // ! 6
+    void initCustomPlot2();
 
 private slots:
     // ! 1
@@ -31,6 +35,10 @@ private slots:
     void onMyGauge3LineEditMinValueChange(QString);
     void onMyGauge3LineEditMaxValueChange(QString);
     void onMyGauge3Value(qreal);
+    // ! 4
+    void onMyCoolBarLineEditValue(int);
+    // ! 5
+    void addRandomGraph();
 private:
     Ui::Widget *ui;
     // ! 1
@@ -44,6 +52,9 @@ private:
     QLineEdit*          m_pMyGauge3LineEditMax;
     QLineEdit*          m_pMyGauge3LineEditMin;
     QLineEdit*          m_pMyGauge3LineEditCurVal;
+    // ! 4
+    myCoolBar*       m_pMyCoolBar;
+    QLineEdit*         m_pMyCoolBarLineEditCurVal;
 };
 
 #endif // MAINWIDGET_H
