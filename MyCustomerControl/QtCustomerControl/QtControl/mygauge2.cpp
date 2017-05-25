@@ -15,7 +15,7 @@ void myGauge2::initVariables()
     m_center=rect().center();
     m_value=0;
     m_currentValue=0;
-    m_bAnimating = TRUE;
+    m_bAnimating = true;
     updateTimer=new QTimer(this);
     updateTimer->setInterval(10);
     connect(updateTimer,SIGNAL(timeout()),this,SLOT(UpdateGraph()));

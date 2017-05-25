@@ -69,7 +69,7 @@ void Widget::init()
     m_pMyCoolBarLineEditCurVal->setGeometry(900, 230, 80, 20);
     m_pMyCoolBarLineEditCurVal->setStyleSheet("QLineEdit{border: 1px solid gray;border-radius:5px; background:rgba(255,255,255,0);\
                                               padding: 0px 10px 0px 20px; background: #968d5c; selection-background-color: darkgray;}");
-    m_pMyCoolBarLineEditCurVal->setEnabled(FALSE);
+    m_pMyCoolBarLineEditCurVal->setEnabled(false);
     connect(m_pMyCoolBar, SIGNAL(valueChanged(int)), this, SLOT(onMyCoolBarLineEditValue(int)));
 
     // ! 5
@@ -102,7 +102,11 @@ void Widget::init()
     ui->customPlot->rescaleAxes();
 
     // ! 6
+    ui->customPlot2->setGeometry(10, 350, 600, 300);
     initCustomPlot2();
+
+    // ! 7
+    ui->customPlot3->setGeometry(660, 350, 600, 300);
     }
 
     void Widget::initCustomPlot2()
@@ -146,17 +150,17 @@ void Widget::init()
         ohlc->setTwoColored(true);
 
         // 创建一个坐标轴矩形
-        QCPAxisRect *volumeAxisRect = new QCPAxisRect(customPlot);
-        customPlot->plotLayout()->addElement(1, 0, volumeAxisRect);
+        QCPAxisRect *volumeAxisRect = new QCPAxisRect(ui->customPlot2);
+        ui->customPlot2->plotLayout()->addElement(1, 0, volumeAxisRect);
         volumeAxisRect->setMaximumSize(QSize(QWIDGETSIZE_MAX, 100));
         volumeAxisRect->axis(QCPAxis::atBottom)->setLayer("axes");
         volumeAxisRect->axis(QCPAxis::atBottom)->grid()->setLayer("grid");
         // 设置自己构造的坐标轴矩形属性
-        customPlot->plotLayout()->setRowSpacing(0);
+        ui->customPlot2->plotLayout()->setRowSpacing(0);
         volumeAxisRect->setAutoMargins(QCP::msLeft|QCP::msRight|QCP::msBottom);
         volumeAxisRect->setMargins(QMargins(0, 0, 0, 0));
         // 生成两种颜色的柱状图
-        customPlot->setAutoAddPlottableToLegend(false);//是否自动生成图例
+        ui->customPlot2->setAutoAddPlottableToLegend(false);//是否自动生成图例
         QCPBars *volumePos = new QCPBars(volumeAxisRect->axis(QCPAxis::atBottom), volumeAxisRect->axis(QCPAxis::atLeft));
         QCPBars *volumeNeg = new QCPBars(volumeAxisRect->axis(QCPAxis::atBottom), volumeAxisRect->axis(QCPAxis::atLeft));
         for (int i=0; i<n/5; ++i)
@@ -172,27 +176,31 @@ void Widget::init()
         volumeNeg->setBrush(QColor(180, 90, 90));
 
         // 设置自己构造的坐标轴矩形的x轴和QCustomPlot中的坐标轴矩形(默认的会生成一个)x轴同步，两个坐标轴永远显示的坐标范围是一样的
-        connect(customPlot->xAxis, SIGNAL(rangeChanged(QCPRange)), volumeAxisRect->axis(QCPAxis::atBottom), SLOT(setRange(QCPRange)));
-        connect(volumeAxisRect->axis(QCPAxis::atBottom), SIGNAL(rangeChanged(QCPRange)), customPlot->xAxis, SLOT(setRange(QCPRange)));
+        connect(ui->customPlot2->xAxis, SIGNAL(rangeChanged(QCPRange)), volumeAxisRect->axis(QCPAxis::atBottom), SLOT(setRange(QCPRange)));
+        connect(volumeAxisRect->axis(QCPAxis::atBottom), SIGNAL(rangeChanged(QCPRange)), ui->customPlot2->xAxis, SLOT(setRange(QCPRange)));
         // 构造一个新的坐标轴刻度计算类
         QSharedPointer<QCPAxisTickerDateTime> dateTimeTicker(new QCPAxisTickerDateTime);
         dateTimeTicker->setDateTimeSpec(Qt::UTC);
         dateTimeTicker->setDateTimeFormat("dd. MMMM");
         volumeAxisRect->axis(QCPAxis::atBottom)->setTicker(dateTimeTicker);//赋予自己构造的坐标轴矩形的x轴一个新的刻度计算类
         volumeAxisRect->axis(QCPAxis::atBottom)->setTickLabelRotation(15);
-        customPlot->xAxis->setBasePen(Qt::NoPen);
-        customPlot->xAxis->setTickLabels(false);//不显示坐标轴文本
-        customPlot->xAxis->setTicks(false); //  不显示坐标轴  (这个接口实现的不友好，后续文章我会具体说到)
-        customPlot->xAxis->setTicker(dateTimeTicker);//赋予默认的坐标轴矩形的x轴一个新的刻度计算类
-        customPlot->rescaleAxes();
-        customPlot->xAxis->scaleRange(1.025, customPlot->xAxis->range().center());
-        customPlot->yAxis->scaleRange(1.1, customPlot->yAxis->range().center());
+
+
+        ui->customPlot2->xAxis->setBasePen(Qt::NoPen);
+        ui->customPlot2->xAxis->setTickLabels(false);//不显示坐标轴文本
+        ui->customPlot2->xAxis->setTicks(false); //  不显示坐标轴  (这个接口实现的不友好，后续文章我会具体说到)
+        ui->customPlot2->xAxis->setTicker(dateTimeTicker);//赋予默认的坐标轴矩形的x轴一个新的刻度计算类
+        ui->customPlot2->rescaleAxes();
+        ui->customPlot2->xAxis->scaleRange(1.025, ui->customPlot2->xAxis->range().center());
+        ui->customPlot2->yAxis->scaleRange(1.1, ui->customPlot2->yAxis->range().center());
 
         // 设置两个坐标轴矩形左右对齐
-        QCPMarginGroup *group = new QCPMarginGroup(customPlot);
-        customPlot->axisRect()->setMarginGroup(QCP::msLeft|QCP::msRight, group);
+        QCPMarginGroup *group = new QCPMarginGroup(ui->customPlot2);
+        ui->customPlot2->axisRect()->setMarginGroup(QCP::msLeft|QCP::msRight, group);
         volumeAxisRect->setMarginGroup(QCP::msLeft|QCP::msRight, group);
     }
+
+
 void Widget::onMyGauge1LineEditValueChange(QString text)
 {
     int nValue = text.toInt();
@@ -258,4 +266,12 @@ void Widget::addRandomGraph()
     graphPen.setWidthF(rand()/(double)RAND_MAX*2+1);
     ui->customPlot->graph()->setPen(graphPen);
     ui->customPlot->replot();
+}
+
+void Widget::initCustomPlot3()
+{
+    ui->customPlot3->legend->setVisible(true);
+    ui->customPlot3->legend->setFont(QFont("Helvetica", 9));
+    QStringList listNames;
+    listNames << "lsNone" << "lsLine" << "lsStepLeft" << "lsStepRight" << "lsStepCenter" << "lsImpulse";
 }

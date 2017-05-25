@@ -26,6 +26,8 @@ private:
     // ! 6
     void initCustomPlot2();
 
+public:
+
 private slots:
     // ! 1
     void onMyGauge1LineEditValueChange(QString);
@@ -39,6 +41,8 @@ private slots:
     void onMyCoolBarLineEditValue(int);
     // ! 5
     void addRandomGraph();
+    // ! 7
+    void initCustomPlot3();
 private:
     Ui::Widget *ui;
     // ! 1
