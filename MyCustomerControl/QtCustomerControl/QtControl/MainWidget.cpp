@@ -107,98 +107,99 @@ void Widget::init()
 
     // ! 7
     ui->customPlot3->setGeometry(660, 350, 600, 300);
+    initCustomPlot3();
     }
 
-    void Widget::initCustomPlot2()
+void Widget::initCustomPlot2()
+{
+    ui->customPlot2->legend->setVisible(true);
+    int n = 500;
+    QVector<double> time(n), value1(n), value2(n);
+    QDateTime start = QDateTime(QDate(2014, 6, 11));
+    start.setTimeSpec(Qt::UTC);
+    double startTime = start.toTime_t();
+    double binSize = 3600*24; // 1天的数据
+    time[0] = startTime;
+    value1[0] = 60;
+    value2[0] = 20;
+    qsrand(9);//生成随机数时给指定的种子，那么生成的随机数都是相同的，因此每次运行后得到的结果都是不变的
+    for (int i=1; i<n; ++i)
     {
-        ui->customPlot2->legend->setVisible(true);
-        int n = 500;
-        QVector<double> time(n), value1(n), value2(n);
-        QDateTime start = QDateTime(QDate(2014, 6, 11));
-        start.setTimeSpec(Qt::UTC);
-        double startTime = start.toTime_t();
-        double binSize = 3600*24; // 1天的数据
-        time[0] = startTime;
-        value1[0] = 60;
-        value2[0] = 20;
-        qsrand(9);//生成随机数时给指定的种子，那么生成的随机数都是相同的，因此每次运行后得到的结果都是不变的
-        for (int i=1; i<n; ++i)
-        {
-          time[i] = startTime + 3600*i;
-          value1[i] = value1[i-1] + (qrand()/(double)RAND_MAX-0.5)*10;
-          value2[i] = value2[i-1] + (qrand()/(double)RAND_MAX-0.5)*3;
-        }
-
-        // 初始化一个蜡烛图指针:
-        QCPFinancial *candlesticks = new QCPFinancial(ui->customPlot2->xAxis, ui->customPlot2->yAxis);
-        candlesticks->setName("Candlestick");
-        candlesticks->setChartStyle(QCPFinancial::csCandlestick);//设置图表类型为蜡烛图
-        candlesticks->data()->set(QCPFinancial::timeSeriesToOhlc(time, value1, binSize, startTime));//设置数据
-        candlesticks->setWidth(binSize*0.9);//设置每一个数据项的绘制宽度
-        candlesticks->setTwoColored(true);//设置是否显示两种颜色
-        candlesticks->setBrushPositive(QColor(245, 245, 245));//设置收>开画刷
-        candlesticks->setBrushNegative(QColor(40, 40, 40));//设置收<开画刷
-        candlesticks->setPenPositive(QPen(QColor(0, 0, 0)));//设置收>开画笔
-        candlesticks->setPenNegative(QPen(QColor(0, 0, 0)));//设置收>开画笔
-
-        // 初始化一个美国线图指针:
-        QCPFinancial *ohlc = new QCPFinancial(ui->customPlot2->xAxis, ui->customPlot2->yAxis);
-        ohlc->setName("OHLC");
-        ohlc->setChartStyle(QCPFinancial::csOhlc);//设置图表类型为美国线
-        ohlc->data()->set(QCPFinancial::timeSeriesToOhlc(time, value2, binSize/3.0, startTime)); //为了区分于蜡烛图显示，
-        ohlc->setWidth(binSize*0.2);
-        ohlc->setTwoColored(true);
-
-        // 创建一个坐标轴矩形
-        QCPAxisRect *volumeAxisRect = new QCPAxisRect(ui->customPlot2);
-        ui->customPlot2->plotLayout()->addElement(1, 0, volumeAxisRect);
-        volumeAxisRect->setMaximumSize(QSize(QWIDGETSIZE_MAX, 100));
-        volumeAxisRect->axis(QCPAxis::atBottom)->setLayer("axes");
-        volumeAxisRect->axis(QCPAxis::atBottom)->grid()->setLayer("grid");
-        // 设置自己构造的坐标轴矩形属性
-        ui->customPlot2->plotLayout()->setRowSpacing(0);
-        volumeAxisRect->setAutoMargins(QCP::msLeft|QCP::msRight|QCP::msBottom);
-        volumeAxisRect->setMargins(QMargins(0, 0, 0, 0));
-        // 生成两种颜色的柱状图
-        ui->customPlot2->setAutoAddPlottableToLegend(false);//是否自动生成图例
-        QCPBars *volumePos = new QCPBars(volumeAxisRect->axis(QCPAxis::atBottom), volumeAxisRect->axis(QCPAxis::atLeft));
-        QCPBars *volumeNeg = new QCPBars(volumeAxisRect->axis(QCPAxis::atBottom), volumeAxisRect->axis(QCPAxis::atLeft));
-        for (int i=0; i<n/5; ++i)
-        {
-          int v = qrand()%20000+qrand()%20000+qrand()%20000-10000*3;
-          (v < 0 ? volumeNeg : volumePos)->addData(startTime+3600*5.0*i, qAbs(v)); //构造随机数据
-        }
-        volumePos->setWidth(3600*4);
-        volumePos->setPen(Qt::NoPen);
-        volumePos->setBrush(QColor(100, 180, 110));
-        volumeNeg->setWidth(3600*4);
-        volumeNeg->setPen(Qt::NoPen);
-        volumeNeg->setBrush(QColor(180, 90, 90));
-
-        // 设置自己构造的坐标轴矩形的x轴和QCustomPlot中的坐标轴矩形(默认的会生成一个)x轴同步，两个坐标轴永远显示的坐标范围是一样的
-        connect(ui->customPlot2->xAxis, SIGNAL(rangeChanged(QCPRange)), volumeAxisRect->axis(QCPAxis::atBottom), SLOT(setRange(QCPRange)));
-        connect(volumeAxisRect->axis(QCPAxis::atBottom), SIGNAL(rangeChanged(QCPRange)), ui->customPlot2->xAxis, SLOT(setRange(QCPRange)));
-        // 构造一个新的坐标轴刻度计算类
-        QSharedPointer<QCPAxisTickerDateTime> dateTimeTicker(new QCPAxisTickerDateTime);
-        dateTimeTicker->setDateTimeSpec(Qt::UTC);
-        dateTimeTicker->setDateTimeFormat("dd. MMMM");
-        volumeAxisRect->axis(QCPAxis::atBottom)->setTicker(dateTimeTicker);//赋予自己构造的坐标轴矩形的x轴一个新的刻度计算类
-        volumeAxisRect->axis(QCPAxis::atBottom)->setTickLabelRotation(15);
-
-
-        ui->customPlot2->xAxis->setBasePen(Qt::NoPen);
-        ui->customPlot2->xAxis->setTickLabels(false);//不显示坐标轴文本
-        ui->customPlot2->xAxis->setTicks(false); //  不显示坐标轴  (这个接口实现的不友好，后续文章我会具体说到)
-        ui->customPlot2->xAxis->setTicker(dateTimeTicker);//赋予默认的坐标轴矩形的x轴一个新的刻度计算类
-        ui->customPlot2->rescaleAxes();
-        ui->customPlot2->xAxis->scaleRange(1.025, ui->customPlot2->xAxis->range().center());
-        ui->customPlot2->yAxis->scaleRange(1.1, ui->customPlot2->yAxis->range().center());
-
-        // 设置两个坐标轴矩形左右对齐
-        QCPMarginGroup *group = new QCPMarginGroup(ui->customPlot2);
-        ui->customPlot2->axisRect()->setMarginGroup(QCP::msLeft|QCP::msRight, group);
-        volumeAxisRect->setMarginGroup(QCP::msLeft|QCP::msRight, group);
+      time[i] = startTime + 3600*i;
+      value1[i] = value1[i-1] + (qrand()/(double)RAND_MAX-0.5)*10;
+      value2[i] = value2[i-1] + (qrand()/(double)RAND_MAX-0.5)*3;
     }
+
+    // 初始化一个蜡烛图指针:
+    QCPFinancial *candlesticks = new QCPFinancial(ui->customPlot2->xAxis, ui->customPlot2->yAxis);
+    candlesticks->setName("Candlestick");
+    candlesticks->setChartStyle(QCPFinancial::csCandlestick);//设置图表类型为蜡烛图
+    candlesticks->data()->set(QCPFinancial::timeSeriesToOhlc(time, value1, binSize, startTime));//设置数据
+    candlesticks->setWidth(binSize*0.9);//设置每一个数据项的绘制宽度
+    candlesticks->setTwoColored(true);//设置是否显示两种颜色
+    candlesticks->setBrushPositive(QColor(245, 245, 245));//设置收>开画刷
+    candlesticks->setBrushNegative(QColor(40, 40, 40));//设置收<开画刷
+    candlesticks->setPenPositive(QPen(QColor(0, 0, 0)));//设置收>开画笔
+    candlesticks->setPenNegative(QPen(QColor(0, 0, 0)));//设置收>开画笔
+
+    // 初始化一个美国线图指针:
+    QCPFinancial *ohlc = new QCPFinancial(ui->customPlot2->xAxis, ui->customPlot2->yAxis);
+    ohlc->setName("OHLC");
+    ohlc->setChartStyle(QCPFinancial::csOhlc);//设置图表类型为美国线
+    ohlc->data()->set(QCPFinancial::timeSeriesToOhlc(time, value2, binSize/3.0, startTime)); //为了区分于蜡烛图显示，
+    ohlc->setWidth(binSize*0.2);
+    ohlc->setTwoColored(true);
+
+    // 创建一个坐标轴矩形
+    QCPAxisRect *volumeAxisRect = new QCPAxisRect(ui->customPlot2);
+    ui->customPlot2->plotLayout()->addElement(1, 0, volumeAxisRect);
+    volumeAxisRect->setMaximumSize(QSize(QWIDGETSIZE_MAX, 100));
+    volumeAxisRect->axis(QCPAxis::atBottom)->setLayer("axes");
+    volumeAxisRect->axis(QCPAxis::atBottom)->grid()->setLayer("grid");
+    // 设置自己构造的坐标轴矩形属性
+    ui->customPlot2->plotLayout()->setRowSpacing(0);
+    volumeAxisRect->setAutoMargins(QCP::msLeft|QCP::msRight|QCP::msBottom);
+    volumeAxisRect->setMargins(QMargins(0, 0, 0, 0));
+    // 生成两种颜色的柱状图
+    ui->customPlot2->setAutoAddPlottableToLegend(false);//是否自动生成图例
+    QCPBars *volumePos = new QCPBars(volumeAxisRect->axis(QCPAxis::atBottom), volumeAxisRect->axis(QCPAxis::atLeft));
+    QCPBars *volumeNeg = new QCPBars(volumeAxisRect->axis(QCPAxis::atBottom), volumeAxisRect->axis(QCPAxis::atLeft));
+    for (int i=0; i<n/5; ++i)
+    {
+      int v = qrand()%20000+qrand()%20000+qrand()%20000-10000*3;
+      (v < 0 ? volumeNeg : volumePos)->addData(startTime+3600*5.0*i, qAbs(v)); //构造随机数据
+    }
+    volumePos->setWidth(3600*4);
+    volumePos->setPen(Qt::NoPen);
+    volumePos->setBrush(QColor(100, 180, 110));
+    volumeNeg->setWidth(3600*4);
+    volumeNeg->setPen(Qt::NoPen);
+    volumeNeg->setBrush(QColor(180, 90, 90));
+
+    // 设置自己构造的坐标轴矩形的x轴和QCustomPlot中的坐标轴矩形(默认的会生成一个)x轴同步，两个坐标轴永远显示的坐标范围是一样的
+    connect(ui->customPlot2->xAxis, SIGNAL(rangeChanged(QCPRange)), volumeAxisRect->axis(QCPAxis::atBottom), SLOT(setRange(QCPRange)));
+    connect(volumeAxisRect->axis(QCPAxis::atBottom), SIGNAL(rangeChanged(QCPRange)), ui->customPlot2->xAxis, SLOT(setRange(QCPRange)));
+    // 构造一个新的坐标轴刻度计算类
+    QSharedPointer<QCPAxisTickerDateTime> dateTimeTicker(new QCPAxisTickerDateTime);
+    dateTimeTicker->setDateTimeSpec(Qt::UTC);
+    dateTimeTicker->setDateTimeFormat("dd. MMMM");
+    volumeAxisRect->axis(QCPAxis::atBottom)->setTicker(dateTimeTicker);//赋予自己构造的坐标轴矩形的x轴一个新的刻度计算类
+    volumeAxisRect->axis(QCPAxis::atBottom)->setTickLabelRotation(15);
+
+
+    ui->customPlot2->xAxis->setBasePen(Qt::NoPen);
+    ui->customPlot2->xAxis->setTickLabels(false);//不显示坐标轴文本
+    ui->customPlot2->xAxis->setTicks(false); //  不显示坐标轴  (这个接口实现的不友好，后续文章我会具体说到)
+    ui->customPlot2->xAxis->setTicker(dateTimeTicker);//赋予默认的坐标轴矩形的x轴一个新的刻度计算类
+    ui->customPlot2->rescaleAxes();
+    ui->customPlot2->xAxis->scaleRange(1.025, ui->customPlot2->xAxis->range().center());
+    ui->customPlot2->yAxis->scaleRange(1.1, ui->customPlot2->yAxis->range().center());
+
+    // 设置两个坐标轴矩形左右对齐
+    QCPMarginGroup *group = new QCPMarginGroup(ui->customPlot2);
+    ui->customPlot2->axisRect()->setMarginGroup(QCP::msLeft|QCP::msRight, group);
+    volumeAxisRect->setMarginGroup(QCP::msLeft|QCP::msRight, group);
+}
 
 
 void Widget::onMyGauge1LineEditValueChange(QString text)
@@ -272,6 +273,34 @@ void Widget::initCustomPlot3()
 {
     ui->customPlot3->legend->setVisible(true);
     ui->customPlot3->legend->setFont(QFont("Helvetica", 9));
-    QStringList listNames;
-    listNames << "lsNone" << "lsLine" << "lsStepLeft" << "lsStepRight" << "lsStepCenter" << "lsImpulse";
+    QStringList lineNames;
+    QPen pen;
+    lineNames << "lsNone" << "lsLine" << "lsStepLeft" << "lsStepRight" << "lsStepCenter" << "lsImpulse";
+    for(int i = QCPGraph::lsNone; i <= QCPGraph::lsImpulse; ++i)
+    {
+        ui->customPlot3->addGraph();
+        pen.setColor(QColor(qSin(i * 1 + 1.2) * 80 + 80, qSin(i*0.3 + 0) * 80 + 80, qSin(i*0.3 + 1.5) * 80 + 80));
+        ui->customPlot3->graph()->setPen(pen);
+        ui->customPlot3->graph()->setName(lineNames.at(i - QCPGraph::lsNone));
+        ui->customPlot3->graph()->setLineStyle((QCPGraph::LineStyle)i);//设置线性
+        ui->customPlot3->graph()->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCircle, 5));
+
+        QVector<double> x(15), y(15);
+        for(int j = 0; j < 15; ++j)
+        {
+            x[j] = j / 15.0 * 5 * 3.14 + 0.01;
+            y[j] = 7 * qSin(x[j]) / x[j] - (i - QCPGraph::lsNone) * 5 + (QCPGraph::lsImpulse) * 5 + 2;
+        }
+        ui->customPlot3->graph()->setData(x, y);
+        ui->customPlot3->graph()->rescaleAxes(true);
+    }
+    ui->customPlot3->yAxis->scaleRange(1.1, ui->customPlot3->yAxis->range().center());
+    ui->customPlot3->xAxis->scaleRange(1.1, ui->customPlot3->xAxis->range().center());
+    // set blank axis lines:
+    ui->customPlot3->xAxis->setTicks(false);//x轴不显示刻度
+    ui->customPlot3->yAxis->setTicks(true);//y轴显示刻度
+    ui->customPlot3->xAxis->setTickLabels(false);//x轴不显示文本
+    ui->customPlot3->yAxis->setTickLabels(true);//y轴显示文本
+    // make top right axes clones of bottom left axes:
+    ui->customPlot3->axisRect()->setupFullAxesBox();
 }
